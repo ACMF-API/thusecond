@@ -1,5 +1,4 @@
 name: Build, Push to ECR, and Deploy to EC2
-
 on:
   push:
     branches:
@@ -12,7 +11,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_REPOSITORY: thusecond
+      PUBLIC_ECR_REPOSITORY_URI: public.ecr.aws/c4d3l3m6/thusecond
       IMAGE_TAG: latest
 
     steps:
@@ -27,7 +26,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      Step 3: Build Maven project
+      # Step 3: Build Maven project
       - name: Build Maven Project
         run: |
           chmod +x mvnw
@@ -37,15 +36,15 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      # Step 5: Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # Step 5: Log in to Amazon ECR
+      # Step 6: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
