@@ -45,6 +45,19 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      # Step 6: Check if Public ECR Exists and Create If Not
+      - name: Create Public ECR if it does not exist
+        run: |
+          REPO_NAME="thusecond"
+          EXISTING_REPO=$(aws ecr-public describe-repositories --region us-east-1 --query "repositories[?repositoryName=='$REPO_NAME'].repositoryName" --output text || echo "")
+
+          if [ -z "$EXISTING_REPO" ]; then
+            echo "Public ECR repository does not exist. Creating..."
+            aws ecr-public create-repository --repository-name $REPO_NAME --region us-east-1
+          else
+            echo "Public ECR repository already exists. Skipping creation."
+          fi
+
       # Step 6: Log in to Amazon ECR
       - name: Log in to Amazon ECR Public
         run: |
