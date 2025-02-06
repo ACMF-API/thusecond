@@ -1,0 +1,29 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "appsFolders": ["thusecond"],
+    "baseName": "thusecond",
+    "buildTool": "maven",
+    "cacheProvider": "hazelcast",
+    "clientFramework": null,
+    "clientPackageManager": null,
+    "clientTheme": null,
+    "creationTimestamp": 1738826870405,
+    "databaseType": "sql",
+    "directoryPath": "../",
+    "enableHibernateCache": false,
+    "enableTranslation": false,
+    "entities": [],
+    "jhipsterVersion": "8.8.0",
+    "jwtSecretKey": "Yjc5NmQ2MzJjZDlmYjFjODEwM2RlZWE2NmNiYWE0OGUwZWY4ZmY0MTNkMjRkNGU2MjM5YTlhZDMxYzNjZTc4NzgzM2I2OTk1MjBjOGIxNTJhYTg1MzE2NDU0MWFmN2I0MzQyNjYxNGI0ZWMxOWQ1MTUxYzcxNjhlM2FkYmNhYzA=",
+    "microfrontend": false,
+    "monitoring": "no",
+    "nativeLanguage": "en",
+    "otherLanguages": null,
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "serviceDiscoveryType": "no",
+    "testFrameworks": null,
+    "websocket": null
+  }
+}

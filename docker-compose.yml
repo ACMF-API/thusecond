@@ -1,0 +1,35 @@
+services:
+  thusecond:
+  image: 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://thusecond-postgresql:5432/thusecond
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://thusecond-postgresql:5432/thusecond
+    ports:
+      - 8080:8080
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8080/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    depends_on:
+      thusecond-postgresql:
+        condition: service_healthy
+  thusecond-postgresql:
+    image: postgres:17.2
+    environment:
+      - POSTGRES_USER=thusecond
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U $${POSTGRES_USER}
+      interval: 5s
+      timeout: 5s
+      retries: 10
