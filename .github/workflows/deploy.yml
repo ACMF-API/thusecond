@@ -27,11 +27,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Step 3: Build Maven project
-      # - name: Build Maven Project
-      #   run: |
-      #     chmod +x mvnw
-      #     ./mvnw -Pprod verify jib:dockerBuild -DskipTests -Dmaven.javadoc.skip=true -DskipITs -C
+      Step 3: Build Maven project
+      - name: Build Maven Project
+        run: |
+          chmod +x mvnw
+          ./mvnw -Pprod verify jib:dockerBuild -DskipTests -Dmaven.javadoc.skip=true -DskipITs -C
 
       # Step 4: Set up Docker
       - name: Set up Docker
@@ -50,13 +50,13 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Step 6: Build and Push Docker Image to ECR
-      # - name: Build and Push Docker Image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #   run: |
-      #     docker image tag thusecond 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
-      #     docker push 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
+      Step 6: Build and Push Docker Image to ECR
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker tag thusecond public.ecr.aws/c4d3l3m6/thusecond:latest
+          docker push public.ecr.aws/c4d3l3m6/thusecond:latest
 
   
   deploy-to-ec2:
@@ -67,6 +67,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+      PUBLIC_ECR_REPOSITORY_URI: public.ecr.aws/c4d3l3m6/thusecond:latest
       ECR_REPOSITORY: thusecond
       IMAGE_TAG: latest
 
@@ -103,8 +104,9 @@ jobs:
             docker-compose --version
 
             # Authenticate to AWS ECR
-            export AWS_REGION=${{ env.AWS_REGION }}
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 637423430820.dkr.ecr.us-east-1.amazonaws.com
+            #export AWS_REGION=${{ env.AWS_REGION }}
+            #aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 637423430820.dkr.ecr.us-east-1.amazonaws.com
+            docker pull public.ecr.aws/c4d3l3m6/thusecond:latest
 
             # Pull the latest Docker image
             docker pull 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
