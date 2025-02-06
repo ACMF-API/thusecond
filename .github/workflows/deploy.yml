@@ -28,10 +28,10 @@ jobs:
           java-version: '17'
 
       # Step 3: Build Maven project
-      - name: Build Maven Project
-        run: |
-          chmod +x mvnw
-          ./mvnw -Pprod verify jib:dockerBuild -DskipTests -Dmaven.javadoc.skip=true -DskipITs -C
+      # - name: Build Maven Project
+      #   run: |
+      #     chmod +x mvnw
+      #     ./mvnw -Pprod verify jib:dockerBuild -DskipTests -Dmaven.javadoc.skip=true -DskipITs -C
 
       # Step 4: Set up Docker
       - name: Set up Docker
@@ -46,17 +46,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # Step 5: Log in to Amazon ECR
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # - name: Log in to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
 
       # Step 6: Build and Push Docker Image to ECR
-      - name: Build and Push Docker Image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          docker image tag thusecond 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
-          docker push 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
+      # - name: Build and Push Docker Image
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #   run: |
+      #     docker image tag thusecond 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
+      #     docker push 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
 
   deploy-to-ec2:
     runs-on: ubuntu-latest
@@ -68,6 +68,8 @@ jobs:
       EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       ECR_REPOSITORY: thusecond
       IMAGE_TAG: latest
+      env: KEYPAIR_NAME: ${{ secrets.KEYPAIR_NAME }}
+
 
     steps:
       - name: Checkout the repository
@@ -76,10 +78,11 @@ jobs:
       - name: SSH into EC2 and Deploy Docker Image
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.KEYPAIR_NAME }}.pem
-          chmod 600 ~/.ssh/${{ secrets.KEYPAIR_NAME }}.pem
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/$KEYPAIR_NAME.pem
+          chmod 600 ~/.ssh/$KEYPAIR_NAME.pem
           ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/${{ secrets.KEYPAIR_NAME }}.pem ubuntu@${{ secrets.EC2_IP }} <<EOF
+          ssh -i ~/.ssh/$KEYPAIR_NAME.pem ubuntu@${{ secrets.EC2_IP }} <<EOF
+
             sudo apt update
             sudo apt install -y docker.io
             sudo systemctl start docker
