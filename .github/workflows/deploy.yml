@@ -97,8 +97,10 @@ jobs:
             # Pull and restart the new Docker container
             export AWS_REGION=${{ env.AWS_REGION }}
             # aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com
+            export AWS_REGION=${{ env.AWS_REGION }}
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com
-            docker pull 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com/thusecond:latest
+            docker info
+            docker pull 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest  
 
 
             # Clone repo only if it doesn't exist
