@@ -1,6 +1,6 @@
 services:
   thusecond:
-  image: 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
+    image: 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod,api-docs
