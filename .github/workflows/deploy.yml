@@ -45,10 +45,10 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # Step 5: Log in to Amazon ECR
-      # - name: Log in to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v2
+      Step 5: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       # Step 6: Build and Push Docker Image to ECR
       # - name: Build and Push Docker Image
@@ -87,7 +87,6 @@ jobs:
             sudo systemctl enable docker
             sudo usermod -aG docker ubuntu
             newgrp docker
-
             
             DOCKER_COMPOSE_VERSION="2.20.2"
             sudo rm -f /usr/local/bin/docker-compose
@@ -99,18 +98,18 @@ jobs:
             export AWS_REGION=${{ env.AWS_REGION }}
             # aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com
-            docker pull 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
+            docker pull 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com/thusecond:latest
 
 
             # Clone repo only if it doesn't exist
-            if [ ! -d "thusecond" ]; then
+            if [ -d "thusecond/.git" ]; then
+              cd thusecond
+              git pull origin main
+            else
               git clone https://github.com/Acmf-api/thusecond
+              cd thusecond
             fi
-            cd thusecond
 
-            # Clone the docker-compose repository
-            git clone https://github.com/Acmf-api/thusecond
-            cd thusecond
 
             # Build and deploy the Docker image
             docker-compose up -d
