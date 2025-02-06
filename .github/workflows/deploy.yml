@@ -26,7 +26,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      Step 3: Build Maven project
+     # Step 3: Build Maven project
       - name: Build Maven Project
         run: |
           chmod +x mvnw
