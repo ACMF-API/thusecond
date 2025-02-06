@@ -58,6 +58,7 @@ jobs:
       #     docker image tag thusecond 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
       #     docker push 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest
 
+  
   deploy-to-ec2:
     runs-on: ubuntu-latest
     needs: build-and-push
@@ -81,27 +82,32 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/ec2-keypair.pem ubuntu@${{ secrets.EC2_IP }} <<EOF
 
+            # Install and set up Docker
             sudo apt update
             sudo apt install -y docker.io
             sudo systemctl start docker
             sudo systemctl enable docker
             sudo usermod -aG docker ubuntu
             newgrp docker
-            
+
+            # Install AWS CLI if missing
+            if ! command -v aws &> /dev/null; then
+              sudo apt install -y awscli
+            fi
+
+            # Install Docker Compose
             DOCKER_COMPOSE_VERSION="2.20.2"
             sudo rm -f /usr/local/bin/docker-compose
             sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
             sudo chmod +x /usr/local/bin/docker-compose
             docker-compose --version
 
-            # Pull and restart the new Docker container
-            export AWS_REGION=${{ env.AWS_REGION }}
-            # aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com
+            # Authenticate to AWS ECR
             export AWS_REGION=${{ env.AWS_REGION }}
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com
-            docker info
-            docker pull 637423430820.dkr.ecr.us-east-1.amazonaws.com/thusecond:latest  
 
+            # Pull the latest Docker image
+            docker pull 637423430820.dkr.ecr.$AWS_REGION.amazonaws.com/thusecond:latest
 
             # Clone repo only if it doesn't exist
             if [ -d "thusecond/.git" ]; then
@@ -112,7 +118,7 @@ jobs:
               cd thusecond
             fi
 
-
-            # Build and deploy the Docker image
-            docker-compose up -d
+            # Deploy the updated Docker image
+            docker-compose down
+            docker-compose up -d --force-recreate
           EOF
