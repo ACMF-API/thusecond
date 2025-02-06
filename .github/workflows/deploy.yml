@@ -68,8 +68,7 @@ jobs:
       EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       ECR_REPOSITORY: thusecond
       IMAGE_TAG: latest
-      env: KEYPAIR_NAME: ${{ secrets.KEYPAIR_NAME }}
-
+      KEYPAIR_NAME: ${{ secrets.KEYPAIR_NAME }}
 
     steps:
       - name: Checkout the repository
